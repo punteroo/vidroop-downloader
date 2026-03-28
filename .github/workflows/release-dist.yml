@@ -1,0 +1,47 @@
+name: Release dist on master
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build extension
+        run: yarn build
+
+      - name: Compute release tag
+        id: tag
+        run: echo "value=master-build-${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
+
+      - name: Create or update release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.tag.outputs.value }}
+          name: Master build #${{ github.run_number }}
+          generateReleaseNotes: true
+          allowUpdates: true
+          removeArtifacts: true
+          artifacts: "dist/**"

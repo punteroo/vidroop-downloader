@@ -1,4 +1,4 @@
-name: Release dist on master
+name: Build extension and create release
 
 on:
   push:
@@ -29,19 +29,62 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      - name: Validate and resolve version metadata
+        id: version
+        run: |
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          MANIFEST_VERSION=$(node -p "require('./manifest.json').version")
+
+          if [ "$PACKAGE_VERSION" != "$MANIFEST_VERSION" ]; then
+            echo "::error::Version mismatch: package.json=$PACKAGE_VERSION manifest.json=$MANIFEST_VERSION"
+            exit 1
+          fi
+
+          ZIP_NAME="vidroop-downloader-v${PACKAGE_VERSION}.zip"
+
+          echo "value=${PACKAGE_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag=v${PACKAGE_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "zip_name=${ZIP_NAME}" >> "$GITHUB_OUTPUT"
+
       - name: Build extension
         run: yarn build
 
-      - name: Compute release tag
-        id: tag
-        run: echo "value=master-build-${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
+      - name: Package dist as zip
+        run: |
+          cd dist
+          zip -r "../${{ steps.version.outputs.zip_name }}" .
+
+      - name: Build release body (EN + ES)
+        run: |
+          cat > release_body.md << 'EOF'
+          ## How to download and install (English)
+
+          1. Download the asset named `vidroop-downloader-v${{ steps.version.outputs.value }}.zip` from this release.
+          2. Extract the zip to a local folder.
+          3. Open `chrome://extensions` in Chromium/Chrome.
+          4. Enable **Developer mode**.
+          5. Click **Load unpacked**.
+          6. Select the extracted folder.
+          7. Open a supported Vidroop page and use the extension.
+
+          ## Cómo descargar e instalar (Español)
+
+          1. Descarga el archivo `vidroop-downloader-v${{ steps.version.outputs.value }}.zip` de este release.
+          2. Descomprime el zip en una carpeta local.
+          3. Abre `chrome://extensions` en Chromium/Chrome.
+          4. Activa el **Modo desarrollador**.
+          5. Haz clic en **Cargar descomprimida**.
+          6. Selecciona la carpeta extraída.
+          7. Abre una página compatible de Vidroop y usa la extensión.
+          EOF
 
       - name: Create or update release
-        uses: ncipollo/release-action@v1
+        uses: softprops/action-gh-release@v2
         with:
-          tag: ${{ steps.tag.outputs.value }}
-          name: Master build #${{ github.run_number }}
-          generateReleaseNotes: true
-          allowUpdates: true
-          removeArtifacts: true
-          artifacts: "dist/**"
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: v${{ steps.version.outputs.value }}
+          body_path: release_body.md
+          append_body: true
+          generate_release_notes: true
+          files: ${{ steps.version.outputs.zip_name }}
+          overwrite_files: true

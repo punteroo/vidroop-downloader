@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vidroop Downloader</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="popup">
+      <header class="popup__header">
+        <h1 id="title"></h1>
+        <p id="subtitle"></p>
+      </header>
+
+      <section class="popup__section">
+        <label for="languageSelect" id="languageLabel"></label>
+        <select id="languageSelect" class="popup__select">
+          <option value="en">English</option>
+          <option value="es-419">Español (Argentina / Latinoamérica)</option>
+        </select>
+      </section>
+
+      <p id="status" class="popup__status" aria-live="polite"></p>
+    </main>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

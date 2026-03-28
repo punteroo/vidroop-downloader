@@ -1,0 +1,21 @@
+{
+  "name": "vidroop-download",
+  "version": "1.0.0",
+  "author": "Lucas 'punteroo' Maza",
+  "private": true,
+  "description": "Vidroop browser extension with HLS download and browser-only conversion.",
+  "scripts": {
+    "check": "node --check content.js && node --check background.js && node --check popup.js && node --check conversion.worker.js",
+    "build": "node scripts/build-extension.js",
+    "build:check": "yarn build && node --check dist/content.js && node --check dist/background.js && node --check dist/popup.js && node --check dist/conversion.worker.js",
+    "deps:update": "yarn upgrade mux.js mp4box"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "mp4box": "^2.3.0",
+    "mux.js": "^6.3.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.27.4"
+  }
+}

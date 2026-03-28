@@ -1,0 +1,11 @@
+{
+  "extensionName": {
+    "message": "Vidroop Video Downloader"
+  },
+  "extensionDescription": {
+    "message": "Download videos from Vidroop platforms."
+  },
+  "extensionTitle": {
+    "message": "Vidroop Downloader"
+  }
+}

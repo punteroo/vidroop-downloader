@@ -1,0 +1,40 @@
+{
+  "manifest_version": 3,
+  "default_locale": "en",
+  "name": "__MSG_extensionName__",
+  "version": "1.0",
+  "description": "__MSG_extensionDescription__",
+  "permissions": ["webRequest", "storage", "downloads"],
+  "host_permissions": [
+    "https://*.vidroop.com/*",
+    "https://iframe.mediadelivery.net/*",
+    "https://*.b-cdn.net/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "__MSG_extensionTitle__",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*.vidroop.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "conversion.worker.js",
+        "node_modules/mux.js/dist/mux.min.js",
+        "node_modules/mp4box/dist/mp4box.all.js"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "icons": {
+    "128": "icon.png"
+  }
+}
